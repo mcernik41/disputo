@@ -1,0 +1,32 @@
+# Vygenerováno chatGPT
+# Složky generované za běhu
+/temp/
+/log/
+
+# Závislosti přes Composer
+/vendor/
+
+# IDE a editor specifické soubory
+/.idea/
+/.vscode/
+/nbproject/
+*.sublime-*
+
+# OS specifické soubory
+.DS_Store
+Thumbs.db
+
+# Konfigurační přepisovatelné soubory
+.env
+.env.local
+.env.*.local
+
+# Vlastní skripty nebo výstupy buildů, pokud nějaké máš
+/build/
+/dist/
+
+# Výstupní cache, např. Latte
+**/*.cache
+
+# Debug bary, pokud bys měl logování do souborů
+*.log
