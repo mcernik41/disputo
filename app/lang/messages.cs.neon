@@ -1,0 +1,22 @@
+hello: "Ahoj světe"
+welcome: "Vítejte na Disputo!"
+changeLocale: "Změnit jazyk"
+currentLocale: "Aktuální jazyk: %locale"
+selectLocale: "Vyberte jazyk"
+locales:
+    en: "Angličtina"
+    cs: "Čeština"
+    sk: "Slovenština"
+user:
+    name: "Uživatel"
+    email: "Email"
+    password: "Heslo"
+    signIn: "Přihlásit se"
+    signUp: "Registrovat se"
+    logout: "Odhlásit se"
+menu:
+    home: "Domů"
+    about: "O Disputo"
+    contact: "Kontakt"
+    settings: "Nastavení"
+    help: "Nápověda"

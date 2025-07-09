@@ -19,7 +19,8 @@
 		"nette/security": "^3.2",
 		"nette/utils": "^4.0",
 		"latte/latte": "^3.0",
-		"tracy/tracy": "^2.10"
+		"tracy/tracy": "^2.10",
+		"contributte/translation": "^2.0"
 	},
 	"require-dev": {
 		"nette/tester": "^2.5",

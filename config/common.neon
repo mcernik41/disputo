@@ -21,7 +21,10 @@ latte:
 	strictParsing: yes
 	extensions:
 		- App\Presentation\Accessory\LatteExtension
+		- Latte\Essential\TranslatorExtension(@Nette\Localization\Translator)
 
+extensions:
+	translation: Contributte\Translation\DI\TranslationExtension
 
 assets:
 	mapping:
@@ -34,3 +37,14 @@ di:
 	export:
 		parameters: no
 		tags: no
+
+translation:
+	locales:
+		whitelist: [en, cs, sk]
+		default: cs
+		fallback: [cs]
+	dirs:
+		- %appDir%/lang
+	returnOriginalMessage: false # to not translate undefined messages, default is true
+	localeResolvers:
+		- Contributte\Translation\LocalesResolvers\Session

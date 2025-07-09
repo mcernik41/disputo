@@ -1,0 +1,17 @@
+{block menu}
+    <div class="menu">
+        <ul>
+            <li><a href="{link Home:default}">{_messages.menu.home}</a></li>
+            {*<li><a href="{link User:default}">User</a></li>
+            <li><a href="{link Admin:default}">Admin</a></li>
+            <li><a href="{link Auth:logout}">Logout</a></li>*}
+        </ul>
+        <div class="user-info">
+            {ifset user}
+                <span>Welcome, {$user->name}!</span>
+            {else}
+                <span>{_messages.user.signIn}</span>
+            {/ifset}
+        </div>
+    </div>
+{/block}
