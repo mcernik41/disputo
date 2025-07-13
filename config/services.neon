@@ -1,5 +1,7 @@
 services:
 	- App\Core\RouterFactory::createRouter
+	- Authenticator
+	- Authorizator
 
 
 search:
