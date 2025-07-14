@@ -1,6 +1,7 @@
 services:
 	- App\Core\RouterFactory::createRouter
 	- Authenticator
+	- App\Services\DatabaseConsistencyChecker
 
 
 search:

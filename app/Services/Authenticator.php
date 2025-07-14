@@ -1,7 +1,7 @@
 <?php
 
-use Nette;
 use Nette\Security\SimpleIdentity;
+use Nette\Security\IIdentity;
 
 final class Authenticator implements Nette\Security\Authenticator, Nette\Security\IdentityHandler
 {
@@ -14,7 +14,7 @@ final class Authenticator implements Nette\Security\Authenticator, Nette\Securit
 	public function authenticate(string $username, string $password): SimpleIdentity
 	{
 		$row = $this->database->table('user')
-			->where('username', $user_username)
+			->where('user_username', $username)
 			->fetch();
 
 		if (!$row) {
@@ -27,29 +27,29 @@ final class Authenticator implements Nette\Security\Authenticator, Nette\Securit
 
 		return new SimpleIdentity(
 			$row->user_id,
-			$row->role_role_id, // nebo pole více rolí
-			['name' => $row->username, 'name' => $row->user_name, 'surname' => $row->user_surname],
+			$row->user_role_id, // nebo pole více rolí
+			['username' => $row->user_username, 'name' => $row->user_name, 'surname' => $row->user_surname],
 		);
 	}
 
-    public function sleepIdentity(IIdentity $identity): SimpleIdentity
+    public function sleepIdentity(\Nette\Security\IIdentity $identity): \Nette\Security\IIdentity
 	{
 		// vrátíme zástupnou identitu, kde v ID bude authtoken
 		return new SimpleIdentity($identity->authtoken);
 	}
 
-	public function wakeupIdentity(IIdentity $identity): ?SimpleIdentity
+	public function wakeupIdentity(\Nette\Security\IIdentity $identity): ?\Nette\Security\IIdentity
 	{
 		// zástupnou identitu nahradíme plnou identitou, jako v authenticate()
         $row = $this->database->table('user')
 			->where('user_authtoken', $identity->getId())
 			->fetch();
-            
+			
 		return $row
 			? new SimpleIdentity(
-                $row->id, 
-                $row->role_role_id, 
-                ['name' => $row->username, 'name' => $row->user_name, 'surname' => $row->user_surname]
+                $row->user_id, 
+                $row->user_role_id, 
+                ['username' => $row->user_username, 'name' => $row->user_name, 'surname' => $row->user_surname]
             ) : null;
 	}
 }
