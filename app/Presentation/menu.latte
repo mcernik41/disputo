@@ -7,11 +7,12 @@
             <li><a href="{link Auth:logout}">Logout</a></li>*}
         </ul>
         <div class="user-info">
-            {ifset user}
-                <span>Welcome, {$user->name}!</span>
+            {if $user->isLoggedIn()}
+                <span>Welcome, {$user->getIdentity()->name}!</span>
             {else}
-                <span>{_messages.user.signIn}</span>
-            {/ifset}
+                <span><a href="{plink Sign:In}">{_messages.user.signIn}</a></span>
+                <span><a href="{plink Sign:Up}">{_messages.user.signUp}</a></span>
+            {/if}
         </div>
     </div>
 {/block}

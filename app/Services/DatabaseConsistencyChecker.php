@@ -24,6 +24,7 @@ class DatabaseConsistencyChecker
         // Insert roles and keep references for parent assignment
         $roles = [
             'guest' => null,
+            'unapprovedUser' => null,
             'user' => null,
             'politician' => null,
             'moderator' => null,
@@ -37,11 +38,17 @@ class DatabaseConsistencyChecker
             'role_parental_role_id' => null,
         ])->getPrimary();
 
+        // unapprovedUser -> parent guest
+        $roles['unapprovedUser'] = $roleTable->insert([
+            'role_name' => 'unapprovedUser',
+            'role_parental_role_id' => $roles['guest'],
+        ])->getPrimary();
+
         // user, politician, moderator -> parent guest
         foreach (['user', 'politician', 'moderator'] as $role) {
             $roles[$role] = $roleTable->insert([
                 'role_name' => $role,
-                'role_parental_role_id' => $roles['guest'],
+                'role_parental_role_id' => $roles['unapprovedUser'],
             ])->getPrimary();
         }
 

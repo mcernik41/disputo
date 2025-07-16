@@ -1,6 +1,6 @@
 services:
 	- App\Core\RouterFactory::createRouter
-	- Authenticator
+	- App\Services\DisputoAuthenticator
 	- App\Services\DatabaseConsistencyChecker
 
 
