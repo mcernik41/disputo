@@ -15,14 +15,11 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
      */
     public DatabaseConsistencyChecker $dbChecker;
 
-    /**
-     * Zde můžete přidat společné proměnné, metody, práci s uživateli atd.
-     */
     protected function startup(): void
     {
+        // Check database consistency
         parent::startup();
         $this->dbChecker->checkRoles();
-        // Například: předání identity do šablony
         $this->template->user = $this->getUser();
     }
 }
