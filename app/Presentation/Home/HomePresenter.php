@@ -29,7 +29,6 @@ final class HomePresenter extends BasePresenter
 
     public function renderDefault(): void
     {
-        $prefixedTranslator = $this->translator->createPrefixedTranslator('messages');
         $this->translatorSessionResolver->setLocale('cs');
     }
 }

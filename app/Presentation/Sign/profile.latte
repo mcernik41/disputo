@@ -1,0 +1,36 @@
+{block content}
+
+    <h1>{$user->getIdentity()->username}</h1>
+
+    <h2>{_'messages.user.yourRole'}</h2>
+    <p>{$user->getIdentity()->roleName}</p>
+
+    <h2>{_'messages.user.requests.roleRequests'}</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>{_messages.user.requests.id}</th>
+                <th>{_messages.user.requests.roleRequested}</th>
+                <th>{_messages.user.requests.status}</th>
+                <th>{_messages.user.requests.created}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {foreach $roleRequests as $request}
+                <tr>
+                    <td>{$request->roleRequest_id}</td>
+                    <td>{_messages.user.role.{$request->role_name}}</td>
+                    {if $request->user_approval_id == null}
+                        <td>{_messages.user.requests.status_pending}</td>
+                    {else}
+                        <td>{_messages.user.requests.status_approved} {$request->roleRequest_approved|date:'j.n.Y H:i'}</td>
+                    {/if}
+                    <td>{$request->roleRequest_created|date:'j.n.Y H:i'}</td>
+                </tr>
+            {/foreach}
+            {if count($roleRequests) === 0}
+                <tr><td colspan="4">Žádné žádosti nebyly nalezeny.</td></tr>
+            {/if}
+        </tbody>
+    </table>
+{/block}

@@ -14,6 +14,9 @@ final class SignPresenter extends Presenter
 
     #[Nette\DI\Attributes\Inject]
     public \Nette\Localization\Translator $translator;
+
+    #[Nette\DI\Attributes\Inject]
+    public \Nette\Database\Explorer $database;
      
     public function __construct()
     {
@@ -101,5 +104,25 @@ final class SignPresenter extends Presenter
         {
             $form->addError($this->translator->translate('messages.user.signUp_error') . ': ' . $e->getMessage());
         }
+    }
+
+    public function actionProfile(): void
+    {
+        if (!$this->getUser()->isLoggedIn()) {
+            $this->flashMessage($this->translator->translate('messages.user.notLoggedIn'));
+            $this->redirect('Sign:In');
+        }
+    }
+
+    public function renderProfile(): void
+    {
+        dump($this->getUser()->getIdentity());
+        $userId = $this->getUser()->getId();
+        $roleRequests = $this->database->table('roleRequest')
+            ->select('roleRequest.*, role.role_name')
+            ->where('user_requestor_id', $userId)
+            ->joinWhere('role', 'role.role_id = roleRequest.role_requested_id')
+            ->fetchAll();
+        $this->template->roleRequests = $roleRequests;
     }
 }

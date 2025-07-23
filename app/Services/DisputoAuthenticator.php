@@ -50,6 +50,8 @@ final class DisputoAuthenticator implements Authenticator, IdentityHandler
 				'name' => $row->user_name,
 				'surname' => $row->user_surname,
 				'authtoken' => $authtoken,
+				'email' => $row->user_email,
+				'roleName' => $this->database->table('role')->where('role_id', $row->user_role_id)->fetch()->role_name,
 			],
 		);
 	}
