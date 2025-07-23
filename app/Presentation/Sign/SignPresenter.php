@@ -9,30 +9,32 @@ use App\Services\DisputoAuthenticator;
 
 final class SignPresenter extends Presenter
 {
-    /** @var \App\Services\DisputoAuthenticator */
-    private $authenticator;
+    #[Nette\DI\Attributes\Inject]
+    public DisputoAuthenticator $authenticator;
 
-    public function __construct(DisputoAuthenticator $authenticator)
+    #[Nette\DI\Attributes\Inject]
+    public \Nette\Localization\Translator $translator;
+     
+    public function __construct()
     {
         parent::__construct();
-        $this->authenticator = $authenticator;
     }
 
-    public function actionLogout(): void
+    public function actionOut(): void
     {
         $this->getUser()->logout();
         $this->flashMessage('Byl jste úspěšně odhlášen.');
-        $this->redirect('Sign:In');
+        $this->redirect('Home:default');
     }
 
     public function createComponentSignInForm(): Form
     {
         $form = new Form;
-        $form->addText('username', 'Uživatelské jméno:')
-            ->setRequired('Zadejte uživatelské jméno.');
-        $form->addPassword('password', 'Heslo:')
-            ->setRequired('Zadejte heslo.');
-        $form->addSubmit('send', 'Přihlásit se');
+        $form->addText('username', $this->translator->translate('messages.user.username'))
+            ->setRequired($this->translator->translate('messages.user.username_required'));
+        $form->addPassword('password', $this->translator->translate('messages.user.password'))
+            ->setRequired($this->translator->translate('messages.user.password_required'));
+        $form->addSubmit('send', $this->translator->translate('messages.user.signIn'));
         $form->onSuccess[] = [$this, 'signInFormSucceeded'];
         return $form;
     }
@@ -43,38 +45,38 @@ final class SignPresenter extends Presenter
         {
             $identity = $this->authenticator->authenticate($values->username, $values->password);
             $this->getUser()->login($identity);
-            $this->flashMessage('Přihlášení bylo úspěšné.');
+            $this->flashMessage($this->translator->translate('messages.user.signIn_success'));
             $this->redirect('Home:default');
         } 
         catch (Nette\Security\AuthenticationException $e) 
         {
-            $form->addError('Neplatné přihlašovací údaje.');
+            $form->addError($this->translator->translate('messages.user.signIn_error'));
         }
     }
 
     public function createComponentSignUpForm(): Form
     {
         $form = new Form;
-        $form->addText('name', 'Jméno:')
-            ->setRequired('Zadejte jméno.');
-        $form->addText('surname', 'Příjmení:')
-            ->setRequired('Zadejte příjmení.');
-        $form->addText('username', 'Uživatelské jméno:')
-            ->setRequired('Zadejte uživatelské jméno.');
-        $form->addText('email', 'Email:')
-            ->setRequired('Zadejte email.');
-        $form->addCheckbox('politicalAccount', 'Politický účet')
+        $form->addText('name', $this->translator->translate('messages.user.name'))
+            ->setRequired($this->translator->translate('messages.user.name_required'));
+        $form->addText('surname', $this->translator->translate('messages.user.surname'))
+            ->setRequired($this->translator->translate('messages.user.surname_required'));
+        $form->addText('username', $this->translator->translate('messages.user.username'))
+            ->setRequired($this->translator->translate('messages.user.username_required'));
+        $form->addText('email', $this->translator->translate('messages.user.email'))
+            ->setRequired($this->translator->translate('messages.user.email_required'));
+        $form->addCheckbox('politicalAccount', $this->translator->translate('messages.user.politicalAccount'))
             ->setDefaultValue(false)
-            ->setOption('description', 'Ostatní uživatelé uvidí, že jste politik');
-        $form->addCheckbox('publicIdentity', 'Veřejná identita')
+            ->setOption('description', $this->translator->translate('messages.user.politicalAccount_description'));
+        $form->addCheckbox('publicIdentity', $this->translator->translate('messages.user.publicIdentity'))
             ->setDefaultValue(false)
-            ->setOption('description', 'Ostatní uživatelé uvidí vaši identitu (jméno, příjmení, uživatelské jméno)');
-        $form->addPassword('password', 'Heslo:')
-            ->setRequired('Zadejte heslo.');
-        $form->addPassword('passwordVerify', 'Heslo znovu:')
-            ->setRequired('Zadejte heslo znovu.')
-            ->addRule($form::EQUAL, 'Hesla se neshodují.', $form['password']);
-        $form->addSubmit('send', 'Registrovat se');
+            ->setOption('description', $this->translator->translate('messages.user.publicIdentity_description'));
+        $form->addPassword('password', $this->translator->translate('messages.user.password'))
+            ->setRequired($this->translator->translate('messages.user.password_required'));
+        $form->addPassword('passwordVerify', $this->translator->translate('messages.user.passwordVerify'))
+            ->setRequired($this->translator->translate('messages.user.passwordVerify_required'))
+            ->addRule($form::EQUAL, $this->translator->translate('messages.user.passwordMismatch'), $form['password']);
+        $form->addSubmit('send', $this->translator->translate('messages.user.signUp'));
         $form->onSuccess[] = [$this, 'signUpFormSucceeded'];
         return $form;
     }
@@ -92,12 +94,12 @@ final class SignPresenter extends Presenter
                 $values->politicalAccount ?? false,
                 $values->publicIdentity ?? false
             );
-            $this->flashMessage('Registrace byla úspěšná. Nyní se můžete přihlásit.');
+            $this->flashMessage($this->translator->translate('messages.user.signUp_success'));
             $this->redirect('Sign:In');
         } 
-        catch (\Exception $e) 
+        catch (Nette\Security\AuthenticationException $e) 
         {
-            $form->addError('Registrace se nezdařila: ' . $e->getMessage());
+            $form->addError($this->translator->translate('messages.user.signUp_error') . ': ' . $e->getMessage());
         }
     }
 }

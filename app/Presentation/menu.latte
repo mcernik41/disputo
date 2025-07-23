@@ -9,6 +9,7 @@
         <div class="user-info">
             {if $user->isLoggedIn()}
                 <span>Welcome, {$user->getIdentity()->name}!</span>
+                <span><a href="{plink Sign:Out}">{_messages.user.logout}</a></span>
             {else}
                 <span><a href="{plink Sign:In}">{_messages.user.signIn}</a></span>
                 <span><a href="{plink Sign:Up}">{_messages.user.signUp}</a></span>

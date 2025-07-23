@@ -11,6 +11,9 @@ use Nette\Security\Passwords;
 
 final class DisputoAuthenticator implements Authenticator, IdentityHandler
 {
+    #[Nette\DI\Attributes\Inject]
+    public \Nette\Localization\Translator $translator;
+
 	public function __construct(
 		private Explorer $database,
 		private Passwords $passwords,
@@ -25,15 +28,15 @@ final class DisputoAuthenticator implements Authenticator, IdentityHandler
 
 		if (!$row) 
 		{
-			throw new Nette\Security\AuthenticationException('User not found.');
+			throw new Nette\Security\AuthenticationException($this->translator->translate('user.exceptions.notFound'));
 		}
 
 		if (!$this->passwords->verify($password, $row->user_password)) 
 		{
-			throw new Nette\Security\AuthenticationException('Invalid password.');
+			throw new Nette\Security\AuthenticationException($this->translator->translate('user.exceptions.invalidCredentials'));
 		}
 
-		// Generování a uložení authtokenu
+		// Generate and store the auth token
 		$authtoken = bin2hex(random_bytes(32));
 		$this->database->table('user')->where('user_id', $row->user_id)->update([
 			'user_authtoken' => $authtoken
@@ -41,7 +44,7 @@ final class DisputoAuthenticator implements Authenticator, IdentityHandler
 
 		return new SimpleIdentity(
 			$row->user_id,
-			$row->user_role_id, // nebo pole více rolí
+			$row->user_role_id,
 			[
 				'username' => $row->user_username,
 				'name' => $row->user_name,
@@ -53,13 +56,13 @@ final class DisputoAuthenticator implements Authenticator, IdentityHandler
 
     public function sleepIdentity(\Nette\Security\IIdentity $identity): \Nette\Security\IIdentity
 	{
-		// vrátíme zástupnou identitu, kde v ID bude authtoken
+		// returns a placeholder identity, where the ID will be the auth token
 		return new SimpleIdentity($identity->getData()['authtoken'] ?? null);
 	}
 
 	public function wakeupIdentity(\Nette\Security\IIdentity $identity): ?\Nette\Security\IIdentity
 	{
-		// zástupnou identitu nahradíme plnou identitou, jako v authenticate()
+		// replaces the placeholder identity with a full identity, as in authenticate()
         $row = $this->database->table('user')
 			->where('user_authtoken', $identity->getId())
 			->fetch();
@@ -85,27 +88,44 @@ final class DisputoAuthenticator implements Authenticator, IdentityHandler
         $row = $this->database->table('user')->where('user_email', $email)->fetch();
         if ($row) 
         {
-            throw new \Exception('Uživatel s tímto emailem již existuje.');
+			throw new \Exception($this->translator->translate('user.alreadyExists_email.alreadyExists_email'));
         }
 
         $rowUsername = $this->database->table('user')->where('user_username', $username)->fetch();
         if ($rowUsername) 
         {
-            throw new \Exception('Uživatel s tímto uživatelským jménem již existuje.');
+            throw new \Exception($this->translator->translate('user.alreadyExists.alreadyExists'));
         }
         
-        $result = $this->database->table('user')->insert([
-            'user_name' => $name,
-            'user_surname' => $surname,
-            'user_username' => $username,
-            'user_email' => $email,
-            'user_password' => $this->passwords->hash($password),
-            'user_role_id' => 2, // unapproved user role
-            'user_deleted' => 0,
-            'user_approved' => 0,
-            'user_politicalAccount' => $politicalAccount ? 1 : 0,
-            'user_publicIdentity' => $publicIdentity ? 1 : 0,
-        ]);
+		$this->database->beginTransaction();
+		try {
+			$result = $this->database->table('user')->insert([
+			'user_name' => $name,
+			'user_surname' => $surname,
+			'user_username' => $username,
+			'user_email' => $email,
+			'user_password' => $this->passwords->hash($password),
+			'user_role_id' => 2, // unapproved user role
+			'user_deleted' => 0,
+			'user_approved' => 0,
+			'user_politicalAccount' => $politicalAccount ? 1 : 0,
+			'user_publicIdentity' => $publicIdentity ? 1 : 0,
+			]);
+
+			// generates request for approval
+			$this->database->table('roleRequest')->insert([
+			'user_requestor_id' => $result->user_id,
+			'role_requested_id' => 3,
+			'roleRequest_created' => new \Nette\Utils\DateTime()
+			]);
+
+			$this->database->commit();
+		} 
+		catch (\Throwable $e) 
+		{
+			$this->database->rollBack();
+			throw $e;
+		}
         
         \Tracy\Debugger::barDump($result);
     }
