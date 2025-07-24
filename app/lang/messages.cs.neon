@@ -39,6 +39,9 @@ user:
     notLoggedIn: "Nejste přihlášeni"
     noAccount_login: "Nemáte účet? Přihlaste se"
     yourRole: "Vaše role"
+    politicalParty: "Politická strana"
+    politicalParty_prompt: "Vyberte politickou stranu"
+    politicalParty_required: "Vyberte politickou stranu"
     requests: 
         id: "ID žádosti"        
         roleRequests: "Vaše žádosti"

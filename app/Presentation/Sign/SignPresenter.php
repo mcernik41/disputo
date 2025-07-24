@@ -68,9 +68,20 @@ final class SignPresenter extends Presenter
             ->setRequired($this->translator->translate('messages.user.username_required'));
         $form->addText('email', $this->translator->translate('messages.user.email'))
             ->setRequired($this->translator->translate('messages.user.email_required'));
+
         $form->addCheckbox('politicalAccount', $this->translator->translate('messages.user.politicalAccount'))
             ->setDefaultValue(false)
-            ->setOption('description', $this->translator->translate('messages.user.politicalAccount_description'));
+            ->setOption('description', $this->translator->translate('messages.user.politicalAccount_description'))
+            ->addCondition($form::Equal, true)
+            ->toggle('politicalPartyID');
+                
+
+        // Načtení politických stran z DB
+        $parties = $this->database->table('politicalParty')->fetchPairs('politicalParty_id', 'party_name');
+        $form->addSelect('politicalParty', $this->translator->translate('messages.user.politicalParty'), $parties)
+            ->setPrompt($this->translator->translate('messages.user.politicalParty_prompt'))
+            ->setOption('id', 'politicalPartyID');
+
         $form->addCheckbox('publicIdentity', $this->translator->translate('messages.user.publicIdentity'))
             ->setDefaultValue(false)
             ->setOption('description', $this->translator->translate('messages.user.publicIdentity_description'));
@@ -88,6 +99,18 @@ final class SignPresenter extends Presenter
     {
         try 
         {
+            // Pokud je politicalAccount zaškrtnuté, musí být vybrána strana
+            $politicalPartyId = null;
+            if ($values->politicalAccount) 
+            {
+                if (empty($values->politicalParty)) 
+                {
+                    $form->addError($this->translator->translate('messages.user.politicalParty_required'));
+                    return;
+                }
+                $politicalPartyId = $values->politicalParty;
+            }
+
             $this->authenticator->register(
                 $values->name,
                 $values->surname,
@@ -95,7 +118,8 @@ final class SignPresenter extends Presenter
                 $values->email,
                 $values->password,
                 $values->politicalAccount ?? false,
-                $values->publicIdentity ?? false
+                $values->publicIdentity ?? false,
+                $politicalPartyId
             );
             $this->flashMessage($this->translator->translate('messages.user.signUp_success'));
             $this->redirect('Sign:In');
