@@ -1,8 +1,8 @@
 services:
 	- App\Core\RouterFactory::createRouter
 	- App\Services\DisputoAuthenticator
+	- App\Services\DisputoAuthorizator
 	- App\Services\DatabaseConsistencyChecker
-
 
 search:
 	-	in: %appDir%

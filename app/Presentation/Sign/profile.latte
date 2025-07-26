@@ -1,9 +1,14 @@
+{block title}{_messages.titles.profile}{/block}
 {block content}
 
     <h1>{$user->getIdentity()->username}</h1>
+    <p>{$user->getIdentity()->name} {$user->getIdentity()->surname}</p>
 
     <h2>{_'messages.user.yourRole'}</h2>
-    <p>{$user->getIdentity()->roleName}</p>
+    <p>{_messages.user.role.{$user->getIdentity()->roleName}}</p>
+
+    <h2>{_'messages.user.requests.requestRole'}</h2>
+    {control roleRequestForm}
 
     <h2>{_'messages.user.requests.roleRequests'}</h2>
     <table class="table">
@@ -23,9 +28,9 @@
                     {if $request->user_approval_id == null}
                         <td>{_messages.user.requests.status_pending}</td>
                     {else}
-                        <td>{_messages.user.requests.status_approved} {$request->roleRequest_approved|date:'j.n.Y H:i'}</td>
+                        <td>{_messages.user.requests.status_approved} {$request->roleRequest_approvedTimestamp|date:'j.n.Y H:i'}</td>
                     {/if}
-                    <td>{$request->roleRequest_created|date:'j.n.Y H:i'}</td>
+                    <td>{$request->roleRequest_createdTimestamp|date:'j.n.Y H:i'}</td>
                 </tr>
             {/foreach}
             {if count($roleRequests) === 0}

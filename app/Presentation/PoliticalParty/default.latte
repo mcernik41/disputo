@@ -1,0 +1,38 @@
+{block title}{_messages.titles.political_party}{/block}
+{block content}
+<h1>{_'messages.party.list'}</h1>
+
+{if count($approvedParties)}
+    <h2>{_'messages.party.approved'}</h2>
+    <ul>
+        {foreach $approvedParties as $party}
+            <li>{$party->politicalParty_name} ({$party->politicalParty_acronyme})</li>
+        {/foreach}
+    </ul>
+{/if}
+
+{if count($unapprovedParties)}
+    <h2>{_'messages.party.unapproved'}</h2>
+    <ul>
+        {foreach $unapprovedParties as $party}
+            <li>
+                {$party->politicalParty_name} ({$party->politicalParty_acronyme})
+                {if $user->isAllowed('politicalParty', 'approve')}
+                    <form method="post" action="{link 'PoliticalParty:approve', $party->politicalParty_id}">
+                        <button type="submit" class="btn btn-success">{_'messages.party.approve'}</button>
+                    </form>
+                {/if}
+            </li>
+        {/foreach}
+    </ul>
+{/if}
+
+{if $user->isAllowed('politicalParty', 'add')}
+    <h2>{_'messages.party.add_new'}</h2>
+    {control addPartyForm}
+{else}
+    <div class="alert alert-danger">
+        {_'messages.party.no_permission'}
+    </div>
+{/if}
+{/block}

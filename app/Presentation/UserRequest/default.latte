@@ -1,0 +1,7 @@
+{block title}{_messages.titles.user_requests}{/block}
+{block content}
+    <h1>{_messages.user.requests.listTitle}</h1>
+    {include userRequestTable.latte, data => $requests, showActions => true}
+    <h2>{_messages.user.requests.historyTitle}</h2>
+    {include userRequestTable.latte, data => $resolvedRequests, showActions => false}
+{/block}

@@ -1,0 +1,41 @@
+<table n:class="$showActions ? 'user-requests' : 'user-requests-history'">
+    <thead>
+        <tr>
+            <th>{_messages.user.requests.id}</th>
+            <th>{_messages.user.requests.user}</th>
+            <th>{_messages.user.requests.currentRole}</th>
+            <th>{_messages.user.requests.roleRequested}</th>
+            {if $showActions}
+                <th>{_messages.user.requests.actions}</th>
+            {else}
+                <th>{_messages.user.requests.status}</th>
+                <th>{_messages.user.requests.approvedTimestamp}</th>
+            {/if}
+        </tr>
+    </thead>
+    <tbody>
+        {foreach $data as $request}
+            <tr>
+                <td>{$request->roleRequest_id}</td>
+                <td>{$request->requestor_userName} ({$request->requestor_userName} {$request->requestor_userSurname})</td>
+                <td>{_messages.user.role.{$request->currentRoleName}}</td>
+                <td>{_messages.user.role.{$request->role_name}}</td>
+                {if $showActions}
+                    <td>
+                        <a n:href="approve!, id => $request->roleRequest_id" class="approve">{_messages.user.requests.approve}</a>
+                        <a n:href="reject!, id => $request->roleRequest_id" class="reject">{_messages.user.requests.reject}</a>
+                    </td>
+                {else}
+                    <td>
+                        {if $request->isApproved}
+                            <span class="approved">{_messages.user.requests.approved}</span>
+                        {else}
+                            <span class="rejected">{_messages.user.requests.rejected}</span>
+                        {/if}
+                    </td>
+                    <td>{$request->roleRequest_approvedTimestamp|date:'d.m.Y H:i'}</td>
+                {/if}
+            </tr>
+        {/foreach}
+    </tbody>
+</table>
