@@ -101,7 +101,8 @@ final class DisputoAuthenticator implements Authenticator, IdentityHandler
 		}
 		
 		$this->database->beginTransaction();
-		try {
+		try 
+		{
 			$insertData = [
 				'user_name' => $name,
 				'user_surname' => $surname,
@@ -114,7 +115,9 @@ final class DisputoAuthenticator implements Authenticator, IdentityHandler
 				'user_politicalAccount' => $politicalAccount ? 1 : 0,
 				'user_publicIdentity' => $publicIdentity ? 1 : 0,
 			];
-			if ($politicalAccount && $politicalPartyId) {
+			
+			if ($politicalAccount && $politicalPartyId) 
+			{
 				$insertData['user_politicalParty_id'] = $politicalPartyId;
 			}
 			$result = $this->database->table('user')->insert($insertData);
