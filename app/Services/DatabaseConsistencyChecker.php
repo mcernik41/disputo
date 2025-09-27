@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use Nette\Database\Explorer;
+use App\Services\Seed\RegionSeeder;
+use App\Services\Seed\AreaSeeder;
 
 class DatabaseConsistencyChecker
 {
@@ -11,6 +13,54 @@ class DatabaseConsistencyChecker
     public function __construct(private \Nette\Database\Explorer $database) 
     {
         $this->explorer = $database;
+    }
+
+    /**
+     * Zajistí existenci systémového uživatele s primárním klíčem -1.
+     * Tento uživatel je používán jako "vlastník" systémově seedovaných záznamů.
+     * Pokud uživatel s user_id = -1 neexistuje, je vložen. Role je nastavena na superadmin (pokud existuje),
+     * jinak admin, jinak první dostupná role.
+     */
+    public function checkSystemUser(): void
+    {
+        // Už existuje?
+        $system = $this->explorer->table('user')->where('user_id', -1)->fetch();
+        if ($system) {
+            return;
+        }
+
+        // Zjistit vhodnou roli
+        $roleId = null;
+        $super = $this->explorer->table('role')->where('role_name', 'superadmin')->fetch();
+        if ($super) {
+            $roleId = $super->getPrimary();
+        } else {
+            $admin = $this->explorer->table('role')->where('role_name', 'admin')->fetch();
+            if ($admin) {
+                $roleId = $admin->getPrimary();
+            } else {
+                // fallback – vezmeme libovolnou první roli (např. guest), aby FK nebyl null pokud to schéma vyžaduje
+                $any = $this->explorer->table('role')->limit(1)->fetch();
+                $roleId = $any?->getPrimary();
+            }
+        }
+
+        // Základní bezpečné heslo – nikdy se nepoužívá k interaktivnímu přihlášení
+        $randomPassword = password_hash(bin2hex(random_bytes(16)), PASSWORD_DEFAULT);
+
+        $this->explorer->table('user')->insert([
+            'user_id' => -1,               // explicitní ID
+            'user_name' => 'System',
+            'user_surname' => 'Account',
+            'user_username' => 'system',
+            'user_email' => 'system@local',
+            'user_password' => $randomPassword,
+            'user_role_id' => $roleId,
+            'user_deleted' => 0,
+            'user_politicalAccount' => 0,
+            'user_publicIdentity' => 0,
+            'user_authtoken' => null,
+        ]);
     }
 
     /**
@@ -98,6 +148,10 @@ class DatabaseConsistencyChecker
             }
             $i++;
         }
+
+        // Po zajištění resources můžeme spustit seedery (pokud jsou tabulky prázdné)
+        (new RegionSeeder($this->explorer))->seed();
+        (new AreaSeeder($this->explorer))->seed();
     }
 
     /**
