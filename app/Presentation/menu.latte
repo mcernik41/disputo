@@ -3,6 +3,12 @@
         <ul>
             <li><a href="{link Home:default}">{_messages.menu.home}</a></li>
             <li><a href="{link PoliticalParty:default}">{_messages.party.list}</a></li>
+            {if $user->isAllowed('region','view')}
+                <li><a href="{link Region:default}">{_messages.menu.region}</a></li>
+            {/if}
+            {if $user->isAllowed('area','view')}
+                <li><a href="{link Area:default}">{_messages.menu.area}</a></li>
+            {/if}
             {if $user->isAllowed('userRequest', 'view')}
                 <li><a href="{link UserRequest:default}">{_messages.user.requests.listMenu}</a></li>
             {/if}

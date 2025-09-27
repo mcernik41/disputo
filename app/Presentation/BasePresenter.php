@@ -40,9 +40,9 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     {
         // Check database consistency
         parent::startup();
-        //$this->dbChecker->checkRoles();
-        //$this->dbChecker->checkResources();
-        //$this->dbChecker->checkResourceAccess();
+        $this->dbChecker->checkRoles();
+        $this->dbChecker->checkResources();
+        $this->dbChecker->checkResourceAccess();
 
         $this->template->user = $this->getUser();
 

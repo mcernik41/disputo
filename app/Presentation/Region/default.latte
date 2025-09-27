@@ -1,0 +1,50 @@
+{block title}{_messages.titles.region}{/block}
+{block content}
+<h1>{_'messages.region.list'}</h1>
+
+{if isset($approvedTree)}
+	<h2>{_'messages.region.approved'}</h2>
+	<ul class="tree">
+		{include #tree nodes => $approvedTree}
+	</ul>
+
+	{if count($unapproved)}
+		<h2>{_'messages.region.unapproved'}</h2>
+		<ul>
+			{foreach $unapproved as $item}
+				<li>
+					{$item->region_name}
+					(<small>{$presenter->buildPath($item)}</small>)
+					{if $user->isAllowed('region','approve')}
+						<form method="post" action="{link 'Region:approve', $item->region_id}" style="display:inline">
+							<button type="submit">{_'messages.region.approve'}</button>
+						</form>
+					{/if}
+				</li>
+			{/foreach}
+		</ul>
+	{/if}
+{else}
+	<ul class="tree">
+		{include #tree nodes => $tree}
+	</ul>
+{/if}
+
+{define #tree}
+	{foreach $nodes as $n}
+		<li>
+			{$n['name']}
+			{if count($n['children'])}
+				<ul>{include #tree nodes => $n['children']}</ul>
+			{/if}
+		</li>
+	{/foreach}
+{/define}
+
+{if $user->isAllowed('region','add')}
+	<h2>{_'messages.region.add_new'}</h2>
+	{control addEntityForm}
+{else}
+	<div class="alert alert-danger">{_'messages.region.no_permission_add'}</div>
+{/if}
+{/block}

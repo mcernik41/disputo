@@ -68,10 +68,12 @@ class DatabaseConsistencyChecker
     {
         $resourceTable = $this->explorer->table('resource');
 
-        // Definice rolí a jejich rodičů
+        // Nově doplněné resource 'region' a 'area' pro hierarchické entity.
         $resourceDefinitions = [
             'politicalParty' => null,
-            'userRequest' => null
+            'userRequest' => null,
+            'region' => null,
+            'area' => null,
         ];
 
         // Získání existujících rolí z DB
@@ -120,19 +122,25 @@ class DatabaseConsistencyChecker
             $resources[$row->resource_name] = $row->getPrimary();
         }
 
-        // Definice práv (příkladová práva, upravte dle potřeby)
+        // Definice práv – doplněna práva pro 'region' a 'area'.
         $accessDefinitions = [
             // role => [resource => [práva]]
             'guest' => [
                 'politicalParty' => ['view'],
+                'region' => ['view'], // hosté mohou prohlížet strom území
+                'area' => ['view'],   // a také okruhů
             ],
             'user' => [
                 'politicalParty' => ['add'],
                 'userRequest' => ['add'],
+                'region' => ['add'], // přidávání nových uzlů území
+                'area' => ['add'],   // přidávání nových uzlů okruhů
             ],
             'admin' => [
                 'politicalParty' => ['approve'],
                 'userRequest' => ['view', 'approve', 'delete'],
+                'region' => ['approve'], // potenciálně budoucí moderace (placeholder)
+                'area' => ['approve'],  // dtto
             ],
         ];
 
