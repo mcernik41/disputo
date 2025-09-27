@@ -8,15 +8,14 @@ use Nette\Security\Authenticator;
 use Nette\Security\IdentityHandler;
 use Nette\Database\Explorer;
 use Nette\Security\Passwords;
+use App\Exceptions\AuthenticationException;
 
 final class DisputoAuthenticator implements Authenticator, IdentityHandler
 {
-	#[Nette\DI\Attributes\Inject]
-	public \Nette\Localization\Translator $translator;
-
 	public function __construct(
 		private Explorer $database,
 		private Passwords $passwords,
+		private \Nette\Localization\Translator $translator,
 	) {
 	}
 
@@ -27,11 +26,11 @@ final class DisputoAuthenticator implements Authenticator, IdentityHandler
 			->fetch();
 
 		if (!$row) {
-			throw new Nette\Security\AuthenticationException($this->translator->translate('messages.user.exceptions.notFound'));
+			throw new AuthenticationException($this->translator->translate('messages.user.exceptions.notFound'));
 		}
 
 		if (!$this->passwords->verify($password, $row->user_password)) {
-			throw new Nette\Security\AuthenticationException($this->translator->translate('messages.user.exceptions.invalidCredentials'));
+			throw new AuthenticationException($this->translator->translate('messages.user.exceptions.invalidCredentials'));
 		}
 
 		// Generate and store the auth token
