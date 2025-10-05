@@ -2,6 +2,9 @@
     <div class="menu">
         <ul>
             <li><a href="{link Home:default}">{_messages.menu.home}</a></li>
+            {if $user->isAllowed('topic','view')}
+                <li><a href="{link Topic:default}">{_messages.menu.topics}</a></li>
+            {/if}
             <li><a href="{link PoliticalParty:default}">{_messages.party.list}</a></li>
             {if $user->isAllowed('region','view')}
                 <li><a href="{link Region:default}">{_messages.menu.region}</a></li>

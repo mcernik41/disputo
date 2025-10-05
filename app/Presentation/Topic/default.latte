@@ -1,0 +1,62 @@
+{block title}{_messages.titles.topic}{/block}
+{block content}
+<h1>{_'messages.topic.list'}</h1>
+
+{if $canAdd}
+    <div style="margin-bottom: 20px;">
+        <a href="{link add}" class="btn btn-primary">{_'messages.topic.add_new'}</a>
+    </div>
+{/if}
+
+{if count($tree)}
+    <ul class="tree topic-tree">
+        {include #tree nodes => $tree}
+    </ul>
+{else}
+    <p>{_'messages.topic.no_topics'}</p>
+{/if}
+
+{define #tree}
+    {foreach $nodes as $n}
+        <li class="topic-item">
+            <div class="topic-header">
+                <h3 class="topic-name">{$n['name']}</h3>
+                <div class="topic-meta">
+                    <span class="topic-author">{_'messages.topic.author'}: {$n['author']}</span>
+                    {if $n['area']}
+                        <span class="topic-area">{_'messages.topic.area'}: {$n['area']}</span>
+                    {/if}
+                    {if $n['region']}
+                        <span class="topic-region">{_'messages.topic.region'}: {$n['region']}</span>
+                    {/if}
+                </div>
+                <div class="topic-actions">
+                    {if $user->getId() == $n['row']->topic_author_id || $user->isAllowed('topic', 'edit_all')}
+                        <a href="{link edit, $n['id']}" class="btn btn-sm btn-secondary">{_'messages.topic.edit'}</a>
+                    {/if}
+                </div>
+            </div>
+            {if $n['description']}
+                <div class="topic-description">
+                    {$n['description']|noescape}
+                </div>
+            {/if}
+            {if count($n['children'])}
+                <ul class="topic-children">
+                    {include #tree nodes => $n['children']}
+                </ul>
+            {/if}
+        </li>
+    {/foreach}
+{/define}
+
+{if !$canAdd}
+    <div class="alert alert-info">
+        {_'messages.topic.login_required'}
+    </div>
+{/if}
+{/block}
+
+{block head}
+    <link rel="stylesheet" href="{$basePath}/styles/topics.css">
+{/block}

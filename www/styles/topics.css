@@ -1,0 +1,275 @@
+/* Topic Styles - Disputo */
+
+/* Topic List Styles */
+.topic-tree {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.topic-item {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background: #f9f9f9;
+    transition: box-shadow 0.2s ease;
+}
+
+.topic-item:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.topic-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.topic-name {
+    margin: 0;
+    color: #333;
+    font-size: 1.25em;
+    font-weight: 600;
+}
+
+.topic-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    font-size: 0.9em;
+    color: #666;
+    min-width: 200px;
+}
+
+.topic-actions {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.topic-description {
+    margin-top: 10px;
+    padding: 10px;
+    background: white;
+    border-radius: 3px;
+    border: 1px solid #eee;
+    line-height: 1.5;
+}
+
+.topic-children {
+    margin-top: 15px;
+    padding-left: 20px;
+    border-left: 3px solid #ddd;
+    list-style: none;
+}
+
+/* Form Styles */
+.topic-form-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.topic-form-container form {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+.topic-form-container table {
+    width: 100%;
+}
+
+.topic-form-container td {
+    padding: 10px 5px;
+    vertical-align: top;
+}
+
+.topic-form-container input[type="text"],
+.topic-form-container select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.topic-form-container input[type="text"]:focus,
+.topic-form-container select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.topic-form-container #quill-editor-container {
+    min-height: 200px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    background: white;
+    margin-top: 5px;
+}
+
+.topic-form-container .ql-editor {
+    min-height: 180px;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.topic-form-container .ql-toolbar {
+    border-top: 1px solid #ddd;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    border-radius: 3px 3px 0 0;
+    background: #f8f9fa;
+}
+
+.topic-form-container .ql-container {
+    border-bottom: 1px solid #ddd;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    border-radius: 0 0 3px 3px;
+}
+
+/* Hide original textarea when Quill is active */
+.topic-form-container textarea.quill-source-textarea {
+    display: none !important;
+}
+
+/* Quill specific styling */
+.topic-form-container .ql-editor.ql-blank::before {
+    font-style: italic;
+    color: #aaa;
+}
+
+.topic-form-container .form-error {
+    color: #d32f2f;
+    font-size: 0.9em;
+    margin-top: 5px;
+}
+
+.topic-form-container input[type="submit"] {
+    background: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.2s ease;
+}
+
+.topic-form-container input[type="submit"]:hover {
+    background: #0056b3;
+}
+
+/* Button Styles */
+.btn {
+    display: inline-block;
+    padding: 5px 10px;
+    text-decoration: none;
+    border-radius: 3px;
+    font-size: 0.9em;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-primary {
+    background: #007bff;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #0056b3;
+    color: white;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #545b62;
+    color: white;
+}
+
+.btn-sm {
+    padding: 3px 8px;
+    font-size: 0.8em;
+}
+
+/* Alert Styles */
+.alert {
+    padding: 10px;
+    border-radius: 3px;
+    margin: 15px 0;
+    border: 1px solid transparent;
+}
+
+.alert-info {
+    background: #d1ecf1;
+    border-color: #b8daff;
+    color: #0c5460;
+}
+
+.alert-success {
+    background: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.alert-danger {
+    background: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .topic-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .topic-meta {
+        min-width: auto;
+        order: 2;
+    }
+    
+    .topic-actions {
+        order: 3;
+        justify-content: flex-end;
+    }
+    
+    .topic-form-container {
+        max-width: 100%;
+        margin: 0 10px;
+    }
+    
+    .topic-children {
+        padding-left: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .topic-item {
+        padding: 10px;
+        margin-bottom: 15px;
+    }
+    
+    .topic-name {
+        font-size: 1.1em;
+    }
+    
+    .btn {
+        padding: 4px 8px;
+        font-size: 0.8em;
+    }
+}
