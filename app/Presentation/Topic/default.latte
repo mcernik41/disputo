@@ -20,7 +20,9 @@
     {foreach $nodes as $n}
         <li class="topic-item">
             <div class="topic-header">
-                <h3 class="topic-name">{$n['name']}</h3>
+                <h3 class="topic-name">
+                    <a href="{link detail, $n['id']}">{$n['name']}</a>
+                </h3>
                 <div class="topic-meta">
                     <span class="topic-author">{_'messages.topic.author'}: {$n['author']}</span>
                     {if $n['area']}
@@ -40,11 +42,6 @@
                 <div class="topic-description">
                     {$n['description']|noescape}
                 </div>
-            {/if}
-            {if count($n['children'])}
-                <ul class="topic-children">
-                    {include #tree nodes => $n['children']}
-                </ul>
             {/if}
         </li>
     {/foreach}

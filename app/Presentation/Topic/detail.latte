@@ -1,0 +1,46 @@
+{block title}{_messages.titles.topic}{/block}
+{block content}
+
+<h1>{$topic->topic_name}</h1>
+<p><strong>Popis:</strong> {$topic->topic_description|noescape}</p>
+<p><strong>Přidal uživatel:</strong> {$author->user_name} {$author->user_surname}</p>
+{if $areaPath && count($areaPath) > 0}
+	<p><strong>Oblast (okruh):</strong> {implode(' / ', $areaPath)}</p>
+{/if}
+{if $regionPath && count($regionPath) > 0}
+	<p><strong>Region:</strong> {implode(' / ', $regionPath)}</p>
+{/if}
+
+{if $subtopics && count($subtopics) > 0}
+	<h2>Podtémata</h2>
+	<ul class="tree topic-tree">
+		    {foreach $subtopics as $sub}
+			    <li class="topic-item">
+				    <div class="topic-header">
+					    <h3 class="topic-name">
+						    <a href="{plink this, id => $sub['topic_id']}">{$sub['topic_name']}</a>
+					    </h3>
+						<div class="topic-meta">
+                            <span class="topic-author">{_'messages.topic.author'}: {$sub['author']}</span>
+						    {if $sub['area']}
+							    <span class="topic-area">Oblast: {$sub['area']}</span>
+						    {/if}
+						    {if $sub['region']}
+							    <span class="topic-region">Region: {$sub['region']}</span>
+						    {/if}
+						</div>
+				    </div>
+				    {if $sub['topic_description']}
+				        <div class="topic-description">
+				            {$sub['topic_description']|noescape}
+				        </div>
+				    {/if}
+			   </li>
+		    {/foreach}
+	</ul>
+{/if}
+{/block}
+
+{block head}
+    <link rel="stylesheet" href="{$basePath}/styles/topics.css">
+{/block}

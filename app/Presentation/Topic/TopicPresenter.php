@@ -26,6 +26,93 @@ use Nette\Utils\ArrayHash;
  */
 final class TopicPresenter extends BasePresenter
 {
+    /**
+     * Vrátí pole názvů oblastí od kořene po konkrétní oblast
+     */
+    private function getAreaPath(?int $areaId): array
+    {
+        $path = [];
+        while ($areaId) {
+            $area = $this->database->table('area')->get($areaId);
+            if (!$area) break;
+            array_unshift($path, $area->area_name);
+            $areaId = $area->area_parentalArea_id ?? null;
+        }
+        return $path;
+    }
+
+    /**
+     * Vrátí pole názvů regionů od kořene po konkrétní region
+     */
+    private function getRegionPath(?int $regionId): array
+    {
+        $path = [];
+        while ($regionId) {
+            $region = $this->database->table('region')->get($regionId);
+            if (!$region) break;
+            array_unshift($path, $region->region_name);
+            $regionId = $region->region_parentalRegion_id ?? null;
+        }
+        return $path;
+    }
+    /**
+     * Akce detail – zobrazí detail tématu podle ID
+     */
+    public function actionDetail(int $id): void
+    {
+        $topic = $this->database->table($this->tableName)
+            ->where($this->idColumn, $id)
+            ->fetch();
+        if (!$topic) {
+            $this->flashMessage($this->translator->translate('messages.' . $this->translationSection . '.not_found'), 'error');
+            $this->redirect('default');
+        }
+
+        // Načtení autora
+        $user = $this->database->table('user')->get($topic->topic_author_id);
+
+        // Hierarchická cesta oblastí a regionů
+        $areaPath = $topic->topic_area_id ? $this->getAreaPath((int)$topic->topic_area_id) : [];
+        $regionPath = $topic->topic_region_id ? $this->getRegionPath((int)$topic->topic_region_id) : [];
+
+        // Načtení podtémat
+
+        // Načtení podtémat včetně názvů oblasti a regionu
+        $subtopicsRaw = $this->database->table($this->tableName)
+            ->where($this->parentColumn, $id)
+            ->order($this->nameColumn)
+            ->fetchAll();
+        $subtopics = [];
+        foreach ($subtopicsRaw as $sub) {
+            $area = $sub->topic_area_id ? $this->database->table('area')->get($sub->topic_area_id) : null;
+            $region = $sub->topic_region_id ? $this->database->table('region')->get($sub->topic_region_id) : null;
+            $author = $sub->topic_author_id ? $this->database->table('user')->get($sub->topic_author_id) : null;
+            $subtopics[] = [
+                'topic_id' => $sub->topic_id,
+                'topic_name' => $sub->topic_name,
+                'topic_description' => $sub->topic_description,
+                'topic_area_id' => $sub->topic_area_id,
+                'topic_region_id' => $sub->topic_region_id,
+                'area' => $area ? $area->area_name : null,
+                'region' => $region ? $region->region_name : null,
+                'author' => $author ? ($author->user_name . ' ' . $author->user_surname) : null,
+            ];
+        }
+
+        $this->template->topic = $topic;
+        $this->template->areaPath = $areaPath;
+        $this->template->regionPath = $regionPath;
+        $this->template->author = $user;
+        $this->template->subtopics = $subtopics;
+    }
+
+    /**
+     * Render detail – předá data do šablony
+     */
+    public function renderDetail(int $id): void
+    {
+        // Data jsou již načtena v actionDetail
+    }
     protected string $tableName = 'topic';
     protected string $idColumn = 'topic_id';
     protected string $nameColumn = 'topic_name';
@@ -123,14 +210,25 @@ final class TopicPresenter extends BasePresenter
                     $authorName = trim(($author['user_name'] ?? '') . ' ' . ($author['user_surname'] ?? ''));
                 }
             }
-            
+            // Zajistit, že area je vždy název oblasti, pokud existuje
+            $areaName = $r['area_name'] ?? '';
+            if (!$areaName && $r['topic_area_id']) {
+                $area = $this->database->table('area')->get($r['topic_area_id']);
+                if ($area) $areaName = $area->area_name;
+            }
+            // Zajistit, že region je vždy název regionu, pokud existuje
+            $regionName = $r['region_name'] ?? '';
+            if (!$regionName && $r['topic_region_id']) {
+                $region = $this->database->table('region')->get($r['topic_region_id']);
+                if ($region) $regionName = $region->region_name;
+            }
             $items[$r[$this->idColumn]] = [
                 'id' => $r[$this->idColumn],
                 'name' => $r[$this->nameColumn],
                 'description' => $r['topic_description'] ?? '',
                 'parent' => $r[$this->parentColumn],
-                'area' => $r['area_name'] ?? '',
-                'region' => $r['region_name'] ?? '',
+                'area' => $areaName,
+                'region' => $regionName,
                 'author' => $authorName ?: 'Neznámý autor',
                 'children' => [],
                 'row' => $r, // plný ActiveRow pro případné rozšíření v šabloně
